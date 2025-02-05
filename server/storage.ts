@@ -1,4 +1,6 @@
-import { type Template, type InsertTemplate, type Config, type InsertConfig } from "@shared/schema";
+import { type Template, type InsertTemplate, type Config, type InsertConfig, workflowTemplates, workflowConfigs } from "@shared/schema";
+import { db } from "./db";
+import { eq, and } from "drizzle-orm";
 
 export interface IStorage {
   getTemplates(): Promise<Template[]>;
@@ -7,21 +9,41 @@ export interface IStorage {
   createConfig(config: InsertConfig): Promise<Config>;
 }
 
-export class MemStorage implements IStorage {
-  private templates: Map<number, Template>;
-  private configs: Map<number, Config>;
-  private nextTemplateId = 1;
-  private nextConfigId = 1;
-
-  constructor() {
-    this.templates = new Map();
-    this.configs = new Map();
-    
-    // Add some default templates
-    this.addDefaultTemplates();
+export class DatabaseStorage implements IStorage {
+  async getTemplates(): Promise<Template[]> {
+    return await db.select().from(workflowTemplates);
   }
 
-  private addDefaultTemplates() {
+  async getTemplateById(id: number): Promise<Template | undefined> {
+    const [template] = await db
+      .select()
+      .from(workflowTemplates)
+      .where(eq(workflowTemplates.id, id));
+    return template;
+  }
+
+  async getConfigsByRepo(owner: string, repo: string): Promise<Config[]> {
+    return await db
+      .select()
+      .from(workflowConfigs)
+      .where(
+        and(
+          eq(workflowConfigs.repoOwner, owner),
+          eq(workflowConfigs.repoName, repo)
+        )
+      );
+  }
+
+  async createConfig(config: InsertConfig): Promise<Config> {
+    const [newConfig] = await db
+      .insert(workflowConfigs)
+      .values(config)
+      .returning();
+    return newConfig;
+  }
+
+  // Add default templates on initialization
+  async addDefaultTemplates() {
     const defaultTemplates: InsertTemplate[] = [
       {
         name: "Node.js CI",
@@ -68,32 +90,14 @@ jobs:
       }
     ];
 
-    defaultTemplates.forEach(template => {
-      const id = this.nextTemplateId++;
-      this.templates.set(id, { ...template, id });
-    });
-  }
-
-  async getTemplates(): Promise<Template[]> {
-    return Array.from(this.templates.values());
-  }
-
-  async getTemplateById(id: number): Promise<Template | undefined> {
-    return this.templates.get(id);
-  }
-
-  async getConfigsByRepo(owner: string, repo: string): Promise<Config[]> {
-    return Array.from(this.configs.values()).filter(
-      config => config.repoOwner === owner && config.repoName === repo
-    );
-  }
-
-  async createConfig(config: InsertConfig): Promise<Config> {
-    const id = this.nextConfigId++;
-    const newConfig = { ...config, id };
-    this.configs.set(id, newConfig);
-    return newConfig;
+    // Only add templates if none exist
+    const existingTemplates = await this.getTemplates();
+    if (existingTemplates.length === 0) {
+      await db.insert(workflowTemplates).values(defaultTemplates);
+    }
   }
 }
 
-export const storage = new MemStorage();
+// Initialize storage and add default templates
+export const storage = new DatabaseStorage();
+void storage.addDefaultTemplates();
