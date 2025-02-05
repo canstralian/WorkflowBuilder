@@ -5,11 +5,11 @@ import { SiGithubactions } from "react-icons/si";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#F6F8FA] flex items-center justify-center p-4">
-      <Card className="w-full max-w-lg">
+    <div className="min-h-screen bg-gradient-to-br from-[#0077B6] via-[#00A8E8] to-[#00D2B2] flex items-center justify-center p-4">
+      <Card className="w-full max-w-lg bg-white/95 backdrop-blur shadow-xl">
         <CardHeader>
           <div className="flex items-center gap-3">
-            <SiGithubactions className="w-8 h-8 text-[#0366D6]" />
+            <SiGithubactions className="w-8 h-8 text-[#0077B6]" />
             <CardTitle className="text-2xl font-inter">Workflow Wizard</CardTitle>
           </div>
         </CardHeader>
@@ -18,7 +18,7 @@ export default function Home() {
             Create and configure GitHub Actions workflows with an intuitive wizard interface.
           </p>
           <Link href="/wizard">
-            <Button className="w-full bg-[#0366D6] hover:bg-[#0356B6]">
+            <Button className="w-full bg-[#0077B6] hover:bg-[#0096D6] text-white">
               Create New Workflow
             </Button>
           </Link>
