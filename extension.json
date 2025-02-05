@@ -1,0 +1,18 @@
+{
+  "name": "Workflow Wizard",
+  "description": "Create and configure GitHub Actions workflows with an intuitive wizard interface",
+  "version": "1.0.0",
+  "tools": [
+    {
+      "name": "workflow-wizard",
+      "description": "Create GitHub Actions workflows",
+      "icon": "public/replit.svg",
+      "entry": "src/tool/main.tsx"
+    }
+  ],
+  "permissions": [
+    "read:repository",
+    "write:repository",
+    "read:user"
+  ]
+}

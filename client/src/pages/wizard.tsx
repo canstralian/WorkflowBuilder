@@ -1,12 +1,13 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import RepoSelector from "@/components/repo-selector";
 import Templates from "@/components/templates";
 import YamlEditor from "@/components/yaml-editor";
-import type { GitHubRepo } from "@/lib/github";
-import type { Template } from "@shared/schema";
+import { type GitHubRepo } from "@/lib/github";
+import { type Template } from "@shared/schema";
+import { common, gradients } from "@/lib/styles";
 
 export default function Wizard() {
   const [selectedRepo, setSelectedRepo] = useState<GitHubRepo>();
@@ -31,27 +32,27 @@ export default function Wizard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0077B6] via-[#00A8E8] to-[#00D2B2] p-4">
-      <Card className="max-w-4xl mx-auto bg-white/95 backdrop-blur shadow-xl">
+    <div className={`min-h-screen ${gradients.background} p-4`}>
+      <Card className={`max-w-4xl mx-auto ${common.card}`}>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="p-6">
           <TabsList className="grid w-full grid-cols-3 bg-[#F8FAFC]">
             <TabsTrigger 
               value="repo" 
-              className="data-[state=active]:bg-[#0077B6] data-[state=active]:text-white"
+              className={common.tab}
             >
               1. Select Repository
             </TabsTrigger>
             <TabsTrigger 
               value="template" 
               disabled={!selectedRepo}
-              className="data-[state=active]:bg-[#0077B6] data-[state=active]:text-white"
+              className={common.tab}
             >
               2. Choose Template
             </TabsTrigger>
             <TabsTrigger 
               value="configure" 
               disabled={!selectedTemplate}
-              className="data-[state=active]:bg-[#0077B6] data-[state=active]:text-white"
+              className={common.tab}
             >
               3. Configure
             </TabsTrigger>
@@ -63,7 +64,7 @@ export default function Wizard() {
               <Button
                 onClick={handleNext}
                 disabled={!selectedRepo}
-                className="bg-[#0077B6] hover:bg-[#0096D6] text-white"
+                className={common.button.primary}
               >
                 Next
               </Button>
@@ -76,14 +77,14 @@ export default function Wizard() {
               <Button
                 variant="outline"
                 onClick={handleBack}
-                className="border-[#0077B6] text-[#0077B6] hover:bg-[#0077B6]/10"
+                className={common.button.outline}
               >
                 Back
               </Button>
               <Button
                 onClick={handleNext}
                 disabled={!selectedTemplate}
-                className="bg-[#0077B6] hover:bg-[#0096D6] text-white"
+                className={common.button.primary}
               >
                 Next
               </Button>
@@ -101,7 +102,7 @@ export default function Wizard() {
               <Button
                 variant="outline"
                 onClick={handleBack}
-                className="border-[#0077B6] text-[#0077B6] hover:bg-[#0077B6]/10"
+                className={common.button.outline}
               >
                 Back
               </Button>
