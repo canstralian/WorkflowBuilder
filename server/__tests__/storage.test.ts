@@ -1,7 +1,6 @@
 import { DatabaseStorage } from '../storage';
 import { db } from '../db';
 import { type Template, type Config } from '@shared/schema';
-import { DrizzleError } from 'drizzle-orm';
 
 // Mock the database module
 jest.mock('../db', () => ({
@@ -35,9 +34,8 @@ describe('DatabaseStorage', () => {
     });
 
     it('should handle database errors', async () => {
-      const dbError = new DrizzleError('Database error');
       mockDb.select.mockReturnValue({
-        from: jest.fn().mockRejectedValue(dbError)
+        from: jest.fn().mockRejectedValue(new Error('Database error'))
       } as any);
 
       await expect(storage.getTemplates()).rejects.toThrow('Database operation failed');
@@ -92,6 +90,16 @@ describe('DatabaseStorage', () => {
 
       const result = await storage.getConfigsByRepo('test-owner', 'test-repo');
       expect(result).toEqual(mockConfigs);
+    });
+
+    it('should handle database errors', async () => {
+      mockDb.select.mockReturnValue({
+        from: jest.fn().mockReturnValue({
+          where: jest.fn().mockRejectedValue(new Error('Database error'))
+        })
+      } as any);
+
+      await expect(storage.getConfigsByRepo('owner', 'repo')).rejects.toThrow('Database operation failed');
     });
   });
 });

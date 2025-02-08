@@ -1,7 +1,6 @@
 import { type Template, type InsertTemplate, type Config, type InsertConfig, workflowTemplates, workflowConfigs } from "@shared/schema";
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
-import { DrizzleError } from "drizzle-orm";
 
 export interface IStorage {
   getTemplates(): Promise<Template[]>;
@@ -13,13 +12,11 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   async getTemplates(): Promise<Template[]> {
     try {
-      return await db.select().from(workflowTemplates);
+      const templates = await db.select().from(workflowTemplates);
+      return templates;
     } catch (error) {
       console.error("Database error in getTemplates:", error);
-      if (error instanceof DrizzleError) {
-        throw new Error("Database operation failed");
-      }
-      throw error;
+      throw new Error("Database operation failed");
     }
   }
 
@@ -32,16 +29,13 @@ export class DatabaseStorage implements IStorage {
       return template;
     } catch (error) {
       console.error("Database error in getTemplateById:", error);
-      if (error instanceof DrizzleError) {
-        throw new Error("Database operation failed");
-      }
-      throw error;
+      throw new Error("Database operation failed");
     }
   }
 
   async getConfigsByRepo(owner: string, repo: string): Promise<Config[]> {
     try {
-      return await db
+      const configs = await db
         .select()
         .from(workflowConfigs)
         .where(
@@ -50,12 +44,10 @@ export class DatabaseStorage implements IStorage {
             eq(workflowConfigs.repoName, repo)
           )
         );
+      return configs;
     } catch (error) {
       console.error("Database error in getConfigsByRepo:", error);
-      if (error instanceof DrizzleError) {
-        throw new Error("Database operation failed");
-      }
-      throw error;
+      throw new Error("Database operation failed");
     }
   }
 
@@ -68,10 +60,7 @@ export class DatabaseStorage implements IStorage {
       return newConfig;
     } catch (error) {
       console.error("Database error in createConfig:", error);
-      if (error instanceof DrizzleError) {
-        throw new Error("Database operation failed");
-      }
-      throw error;
+      throw new Error("Database operation failed");
     }
   }
 
@@ -123,7 +112,7 @@ jobs:
         }
       ];
 
-      // Only add templates if none exist
+      // Check if templates exist before adding
       const existingTemplates = await this.getTemplates();
       if (existingTemplates.length === 0) {
         await db.insert(workflowTemplates).values(defaultTemplates);
@@ -131,7 +120,6 @@ jobs:
     } catch (error) {
       console.error("Error adding default templates:", error);
       // Don't throw here as this is initialization code
-      // Just log the error and continue
     }
   }
 }
