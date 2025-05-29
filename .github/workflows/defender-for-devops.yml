@@ -12,7 +12,7 @@
 #
 # For more information about the action , check out https://github.com/microsoft/security-devops-action
 #
-# Please note this workflow do not integrate your GitHub Org with Microsoft Defender For DevOps. You have to create an integration
+# Please note this workflow does not integrate your GitHub Org with Microsoft Defender for DevOps. You have to create an integration.
 # and provide permission before this can report data back to azure.
 # Read the official documentation here : https://learn.microsoft.com/en-us/azure/defender-for-cloud/quickstart-onboard-github
 
