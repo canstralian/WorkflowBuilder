@@ -1,4 +1,3 @@
-
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
@@ -38,12 +37,18 @@ function setupLogging(app: express.Express) {
   });
 }
 
+// Improved error middleware: don't throw after sending a response
 function setupErrorHandler(app: express.Express) {
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
-    res.status(status).json({ message });
-    throw err;
+    if (!res.headersSent) {
+      res.status(status).json({ message });
+    }
+    // Log error stack in development for debugging
+    if (process.env.NODE_ENV !== "production") {
+      console.error(err);
+    }
   });
 }
 
