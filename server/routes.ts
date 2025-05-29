@@ -11,11 +11,15 @@ const paramsSchema = {
   repo: z.string().min(1, "Repository name is required")
 };
 
+// Robust error handler with stack trace in non-production
 function handleError(error: unknown, message: string) {
+  const isProduction = process.env.NODE_ENV === "production";
   console.error(`${message}:`, error);
-  return { message };
+  if (isProduction) {
+    return { message };
+  }
+  return { message, error: error instanceof Error ? error.stack : String(error) };
 }
-
 export function registerRoutes(app: Express): Server {
   // Get all templates
   app.get("/api/templates", async (_req, res) => {
